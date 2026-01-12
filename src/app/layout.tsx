@@ -16,7 +16,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "FrameRights — Clear, shareable image license records for photographers",
-  description: "A calm, clear way to document how your photos are licensed. Join the waitlist.",
+  description: "FrameRights helps photographers document how their images are licensed — who can use them, for what purpose, and under what terms. Simple, neutral, and readable.",
 };
 
 export default function RootLayout({
