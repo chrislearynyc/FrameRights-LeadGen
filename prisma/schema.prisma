@@ -1,0 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model WaitlistSignup {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  reason    String? // Optional answer to "Main reason"
+  category  String? // Optional answer to category follow-up
+  ip        String? // For basic rate limiting / audit
+  userAgent String?
+  createdAt DateTime @default(now())
+}

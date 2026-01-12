@@ -1,36 +1,140 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# FrameRights Landing Page
+
+A minimal, documentation-first landing page for FrameRights, built with Next.js 14+ (App Router), Tailwind CSS, and Prisma.
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- npm
+
+### Installation
+
+1. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+2. Start Supabase (local Postgres):
+
+   ```bash
+   npx supabase start
+   ```
+
+   *Note: Uses custom ports (DB: 54342, Studio: 54343) to avoid conflicts.*
+
+3. Run migrations:
+
+   ```bash
+   npx prisma migrate dev
+   ```
+
+4. Run the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+## Environment Variables
+
+Copy `.env.example` to `.env` (already done for local if set up by script).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Database
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:54342/postgres"
+
+# Admin Export Auth
+ADMIN_USER="admin"
+ADMIN_PASS="your_secure_password"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Deployment (VPS)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Build the application**:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm run build
+   ```
 
-## Learn More
+2. **Start production server**:
 
-To learn more about Next.js, take a look at the following resources:
+   ```bash
+   npm start
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Database**:
+   - For production, set `DATABASE_URL` to your production Postgres instance.
+   - Run `npx prisma migrate deploy` to apply migrations.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Daily Reports (Cron Setup)
 
-## Deploy on Vercel
+To receive the 6 AM daily email report, you need to trigger the `/api/cron/daily-report` endpoint.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Option 1: Using Vercel Cron (Recommended for Vercel)**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Add a `vercel.json` file to the root:
+
+   ```json
+   {
+     "crons": [
+       {
+         "path": "/api/cron/daily-report",
+         "schedule": "0 11 * * *" // 11:00 UTC = 6:00 AM EST
+       }
+     ]
+   }
+   ```
+
+**Option 2: Using GitHub Actions**
+Create `.github/workflows/daily-report.yml` that runs a `curl` request:
+
+```yaml
+name: Trigger Daily Report
+on:
+  schedule:
+    - cron: '0 11 * * *' # 6 AM EST
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -X GET ${{ secrets.APP_URL }}/api/cron/daily-report \
+          -H "Authorization: Bearer ${{ secrets.REPORT_SECRET }}"
+```
+
+**Option 3: Using a VPS (crontab)**
+Run `crontab -e` and add:
+
+```bash
+0 6 * * * curl -X GET http://localhost:3000/api/cron/daily-report -H "Authorization: Bearer your_secure_token"
+```
+
+### Nginx Example (Reverse Proxy)
+
+Map port 3000 to your domain:
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+## Features
+
+- **Waitlist**: Captures email + optional survey data. Honeypot protected.
+- **Admin Export**: protected CSV export at `/api/admin/export` (Basic Auth).
+- **Design**: Clean, "calm" aesthetic using Tailwind.
