@@ -23,7 +23,7 @@ A minimal, documentation-first landing page for FrameRights, built with Next.js 
    npx supabase start
    ```
 
-   *Note: Uses custom ports (DB: 54342, Studio: 54343) to avoid conflicts.*
+   _Note: Uses custom ports (DB: 54342, Studio: 54343) to avoid conflicts._
 
 3. Run migrations:
 
@@ -96,7 +96,7 @@ Create `.github/workflows/daily-report.yml` that runs a `curl` request:
 name: Trigger Daily Report
 on:
   schedule:
-    - cron: '0 11 * * *' # 6 AM EST
+    - cron: "0 11 * * *" # 6 AM EST
 jobs:
   ping:
     runs-on: ubuntu-latest
