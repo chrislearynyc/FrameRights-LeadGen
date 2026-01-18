@@ -6,6 +6,7 @@ import { HowItWorks } from "@/components/landing/how-it-works";
 import { Comparison } from "@/components/landing/comparison";
 import { WaitlistForm } from "@/components/landing/waitlist-form";
 import { Footer } from "@/components/layout/footer";
+import { MobileNav } from "@/components/layout/mobile-nav";
 
 export default function Home() {
   return (
@@ -32,6 +33,7 @@ export default function Home() {
               Join Waitlist
             </a>
           </div>
+          <MobileNav />
         </div>
       </nav>
 
