@@ -1,0 +1,6 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+Sitemap: https://framerights.com/sitemap.xml
+Sitemap: https://framerights.com/resources-sitemap.xml
